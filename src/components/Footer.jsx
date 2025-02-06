@@ -2,7 +2,6 @@ import React from 'react'
 
 function Footer() {
     return (
-        <div className=' bottom-0 w-full'>
             <footer className="bg-gradient-to-r from-green-100 to-emerald-200 py-8">
                 <div className="container mx-auto px-4">
                     <div className="text-center text-green-900">
@@ -12,7 +11,6 @@ function Footer() {
                     </div>
                 </div>
             </footer>
-        </div>
     )
 }
 
