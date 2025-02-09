@@ -1,7 +1,12 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { ModeContext } from '../context/Mode';
+
 
 const SingleForm = () => {
+    const { changeMode } = React.useContext(ModeContext);
+    const navigate=useNavigate()
     const { register, handleSubmit } = useForm({
         defaultValues: {
             company_data: {
@@ -25,7 +30,8 @@ const SingleForm = () => {
         }
     });
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
+        await changeMode("single")
         const processedData = {
             ...data,
             company_data: {
@@ -46,6 +52,27 @@ const SingleForm = () => {
             num_years: Number(data.num_years),
             market_scenario: data.market_scenario 
         };
+        
+        try {
+            const response = await fetch('http://localhost:8000/api/simulate/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(processedData)
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const result = await response.json();
+            console.log('Simulation results:', result);
+            navigate("/simulation-results");
+        } catch (error) {
+            console.error('Error running simulation:', error);
+        }
+    
         console.log(processedData);
     };
 

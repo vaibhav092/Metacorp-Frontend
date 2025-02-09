@@ -1,7 +1,11 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { ModeContext } from '../context/Mode';
 
 const ParallelForm = () => {
+    const {changeMode } = React.useContext(ModeContext);
+    const navigate =useNavigate()
     const { register, control, handleSubmit } = useForm({
         defaultValues: {
             company_data: {
@@ -37,7 +41,9 @@ const ParallelForm = () => {
         name: 'decision_variations'
     });
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
+        changeMode("parallel");
+        
         const processedData = {
             company_data: {
                 ...data.company_data,
@@ -62,9 +68,30 @@ const ParallelForm = () => {
             num_years: Number(data.num_years),
             monte_carlo_sims: Number(data.monte_carlo_sims)
         };
+    
+        try {
+            const response = await fetch('http://localhost:8000/api/simulate/parallel/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(processedData)
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const result = await response.json();
+            console.log('Parallel simulation results:', result);
+            
+            navigate("/simulation-results");
+        } catch (error) {
+            console.error('Error running parallel simulation:', error);
+        }
+    
         console.log(processedData);
     };
-
     return (
         <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold mb-6 text-[#064e3b]">Parallel Simulation</h2>
